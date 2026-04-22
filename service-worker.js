@@ -1,9 +1,11 @@
-const STATIC_CACHE = "chem-static-v2";
+const STATIC_CACHE = "chem-static-v3";
 const APP_SHELL_FILES = [
   "./",
   "./index.html",
   "./javascript.html",
-  "./stylesheet.html"
+  "./stylesheet.html",
+  "./manifest.webmanifest",
+  "./app-icon.svg"
 ];
 
 self.addEventListener("install", function (event) {
