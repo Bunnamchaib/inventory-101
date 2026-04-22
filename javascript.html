@@ -18,6 +18,7 @@
     currentChemical: "",
     chart: null,
     scanner: null,
+    scannerAutoCloseTimer: null,
     cameraPermission: "unknown",
     scanFormats: [],
     scannerMode: "qr",
@@ -1182,6 +1183,22 @@
     ui["camera-status-text"].textContent = message;
   }
 
+  function clearScannerAutoCloseTimer() {
+    if (state.scannerAutoCloseTimer) {
+      window.clearTimeout(state.scannerAutoCloseTimer);
+      state.scannerAutoCloseTimer = null;
+    }
+  }
+
+  function startScannerAutoCloseTimer() {
+    clearScannerAutoCloseTimer();
+    state.scannerAutoCloseTimer = window.setTimeout(function () {
+      if (!isWithdrawScannerScreenOpen()) return;
+      closeWithdrawScannerScreen("หมดเวลาสแกนแล้ว กลับไปกรอกข้อมูลเองได้");
+      toast("สแกนไม่เจอภายใน 50 วินาที ระบบปิดหน้าสแกนให้อัตโนมัติ", "warning");
+    }, 50000);
+  }
+
   function isWithdrawScannerScreenOpen() {
     return !!ui["withdraw-scanner-screen"] && !ui["withdraw-scanner-screen"].classList.contains("hidden-force");
   }
@@ -1212,6 +1229,7 @@
 
   function closeWithdrawScannerScreen(statusMessage) {
     if (!ui["withdraw-scanner-screen"]) return;
+    clearScannerAutoCloseTimer();
     ui["withdraw-scanner-screen"].classList.add("hidden-force");
     document.body.classList.remove("scanner-screen-open");
     stopScanner();
@@ -1324,6 +1342,7 @@
   async function startScanner() {
     if (!window.Html5Qrcode) return;
     await stopScanner();
+    clearScannerAutoCloseTimer();
     state.scanner = new Html5Qrcode("reader");
     state.scanFormats = getSupportedFormats(state.scannerMode);
     state.scannerBusy = false;
@@ -1342,6 +1361,7 @@
       function (decodedText) {
         if (state.scannerBusy) return;
         state.scannerBusy = true;
+        clearScannerAutoCloseTimer();
         ui["w_scan"].value = decodedText;
         setScannerStatus("อ่านสำเร็จ กำลังค้นหาข้อมูล...");
         resolveScannedCode();
@@ -1349,13 +1369,19 @@
       function () {}
     ).catch(function () {
       state.scannerBusy = false;
+      clearScannerAutoCloseTimer();
       setScannerStatus("เปิดกล้องไม่สำเร็จ ลองขอสิทธิ์กล้องใหม่จากหน้า Settings");
       updateCameraStatusText("เปิดกล้องไม่สำเร็จ ลองกดขอสิทธิ์กล้องใหม่จากหน้า Settings");
+    }).then(function () {
+      if (isWithdrawScannerScreenOpen()) {
+        startScannerAutoCloseTimer();
+      }
     });
   }
 
   function stopScanner() {
     state.scannerBusy = false;
+    clearScannerAutoCloseTimer();
     if (!state.scanner) return Promise.resolve();
     return state.scanner.stop().then(function () {
       if (state.scanner) {
