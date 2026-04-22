@@ -1,4 +1,4 @@
-const STATIC_CACHE = "chem-static-v3";
+const STATIC_CACHE = "chem-static-v4";
 const APP_SHELL_FILES = [
   "./",
   "./index.html",
