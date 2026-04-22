@@ -63,7 +63,7 @@
       "stat-in", "stat-out", "stat-value", "stat-expiry", "usageChart", "admin-master-search", "admin-user-search",
       "btn-test-api", "btn-request-camera", "btn-check-camera", "btn-open-master-modal",
       "btn-open-user-modal", "btn-save-token", "btn-export-csv", "btn-monthly-report", "quick-withdraw",
-      "quick-receive", "quick-dispose", "btn-receive-current-chem", "reader", "w_scan", "w_name", "w_qty",
+      "quick-receive", "quick-dispose", "btn-receive-current-chem", "reader", "scanner-guide", "w_scan", "w_name", "w_qty",
       "w_lot_hint", "w_note", "btn-resolve-scan", "btn-scan-barcode", "btn-scan-qr", "scanner-status", "r_name", "r_lot", "r_qty", "r_mfg", "r_exp", "r_note",
       "d_name", "d_qty", "d_note", "adj_lotId", "adj_lotNo", "adj_exp", "adj_balance", "adj_note",
       "old_u_name", "u_name", "u_full_name", "u_dept", "u_password", "u_role", "u_status", "old_m_name",
@@ -1249,6 +1249,10 @@
     }
     if (ui["btn-scan-qr"]) {
       ui["btn-scan-qr"].classList.toggle("active", state.scannerMode === "qr");
+    }
+    if (ui["scanner-guide"]) {
+      ui["scanner-guide"].classList.toggle("scanner-guide-qr", state.scannerMode === "qr");
+      ui["scanner-guide"].classList.toggle("scanner-guide-barcode", state.scannerMode === "barcode");
     }
   }
 
