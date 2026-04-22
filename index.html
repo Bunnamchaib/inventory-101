@@ -14,32 +14,53 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Sarabun:wght@300;400;600;700&display=swap">
   <script>
     async function loadTextAsset(path) {
-      const response = await fetch(path, { cache: 'no-store' });
+      const response = await fetch(path);
       if (!response.ok) throw new Error('Load failed: ' + path);
       return response.text();
     }
 
+    function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+      navigator.serviceWorker.register('./service-worker.js').catch(function (error) {
+        console.error('Service worker registration failed', error);
+      });
+    }
+
+    function showBootstrapError(error) {
+      const box = document.createElement('div');
+      box.style.position = 'fixed';
+      box.style.left = '16px';
+      box.style.right = '16px';
+      box.style.bottom = '16px';
+      box.style.zIndex = '9999';
+      box.innerHTML =
+        '<div style="max-width:760px;margin:0 auto;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:16px 18px;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,0.08);font-family:Outfit,Sarabun,sans-serif;">' +
+        '<div style="font-weight:800;font-size:18px;margin-bottom:6px;">โหลดไฟล์ระบบไม่สำเร็จ</div>' +
+        '<div style="font-size:14px;line-height:1.6;">ตรวจสอบว่าไฟล์ <strong>index.html</strong>, <strong>javascript.html</strong>, <strong>stylesheet.html</strong> อยู่โฟลเดอร์เดียวกัน และเปิดผ่าน GitHub Pages หรือ web server</div>' +
+        '<div style="margin-top:8px;font-size:12px;opacity:0.8;">' + (error && error.message ? error.message : error) + '</div>' +
+        '</div>';
+      document.body.appendChild(box);
+    }
+
     async function bootstrapAssets() {
-      const cssText = await loadTextAsset('./stylesheet.html');
+      const [cssText, jsText] = await Promise.all([
+        loadTextAsset('./stylesheet.html'),
+        loadTextAsset('./javascript.html')
+      ]);
       const style = document.createElement('style');
       style.textContent = cssText;
       document.head.appendChild(style);
 
-      const jsText = await loadTextAsset('./javascript.html');
       const script = document.createElement('script');
       script.text = jsText;
-      document.body.appendChild(script);
+      document.head.appendChild(script);
     }
 
-    window.addEventListener('load', function () {
+    document.addEventListener('DOMContentLoaded', function () {
+      registerServiceWorker();
       bootstrapAssets().catch(function (error) {
-        document.body.innerHTML =
-          '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Outfit,Sarabun,sans-serif;">' +
-          '<div style="max-width:560px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:24px;border-radius:20px;">' +
-          '<h2 style="font-weight:800;font-size:24px;margin-bottom:8px;">โหลดไฟล์ระบบไม่สำเร็จ</h2>' +
-          '<p style="line-height:1.6;">กรุณาตรวจสอบว่าไฟล์ <strong>stylesheet.html</strong> และ <strong>javascript.html</strong> อยู่ในโฟลเดอร์เดียวกับ <strong>index.html</strong></p>' +
-          '<p style="margin-top:10px;font-size:13px;">' + error.message + '</p>' +
-          '</div></div>';
+        console.error(error);
+        showBootstrapError(error);
       });
     });
   </script>
@@ -62,7 +83,7 @@
         <button id="auth-tab-register" type="button" class="flex-1 text-slate-600 font-black rounded-2xl py-3">สมัครสมาชิก</button>
       </div>
 
-      <form id="login-form" class="space-y-4">
+      <form id="login-form" class="space-y-4" onsubmit="return false;">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Username</label>
@@ -76,19 +97,13 @@
           </div>
         </div>
 
-        <div class="glass rounded-2xl p-4 text-sm text-slate-600 leading-relaxed">
-          <p class="font-black text-slate-800 mb-1">บัญชีตัวอย่างหลัง seed ข้อมูล</p>
-          <p><span class="code-chip">admin / admin1234</span></p>
-          <p class="mt-2"><span class="code-chip">lab001 / lab1234</span></p>
-        </div>
-
         <div class="flex flex-col sm:flex-row gap-3 pt-2">
-          <button id="btn-login" type="submit"
-            class="flex-1 btn-premium btn-blue text-white py-4 rounded-2xl font-black text-lg shadow-xl">เข้าสู่ระบบ</button>
+          <button id="btn-login" type="submit" disabled
+            class="flex-1 btn-premium btn-blue text-white py-4 rounded-2xl font-black text-lg shadow-xl opacity-60 cursor-not-allowed">เข้าสู่ระบบ</button>
         </div>
       </form>
 
-      <form id="register-form" class="space-y-4 hidden-force">
+      <form id="register-form" class="space-y-4 hidden-force" onsubmit="return false;">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Full Name</label>
@@ -120,8 +135,8 @@
           <p>เมื่อสมัครแล้ว ระบบจะเพิ่มข้อมูลลงชีต `User_Master` อัตโนมัติ และกำหนดสิทธิ์เริ่มต้นเป็น `USER`</p>
         </div>
 
-        <button id="btn-register" type="submit"
-          class="w-full btn-premium btn-dark text-white py-4 rounded-2xl font-black text-lg shadow-xl">สมัครสมาชิก</button>
+        <button id="btn-register" type="submit" disabled
+          class="w-full btn-premium btn-dark text-white py-4 rounded-2xl font-black text-lg shadow-xl opacity-60 cursor-not-allowed">สมัครสมาชิก</button>
       </form>
 
       <div class="mt-6 text-xs text-slate-400 leading-relaxed">
@@ -350,7 +365,7 @@
             <p class="mt-1">กด “ขอสิทธิ์กล้อง” จากหน้า Settings ได้ทันที แล้วกลับมาสแกนใหม่</p>
           </div>
         </div>
-        <form id="form-withdraw" class="space-y-4">
+        <form id="form-withdraw" class="space-y-4" onsubmit="return false;">
           <div>
             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">ผลลัพธ์จากการสแกน</label>
             <input type="text" id="w_scan" placeholder="QR / Barcode ที่อ่านได้"
@@ -398,7 +413,7 @@
         <h2 class="text-2xl font-bold text-emerald-700">รับสต็อกใหม่</h2>
         <p class="text-slate-500">กรอกข้อมูล lot ใหม่เพื่อเพิ่มเข้าสต็อก</p>
       </div>
-      <form id="form-receive" class="space-y-4">
+      <form id="form-receive" class="space-y-4" onsubmit="return false;">
         <div>
           <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 px-1">ชื่อสารเคมี</label>
           <input type="text" id="r_name" placeholder="เช่น Buffer pH 7.00"
@@ -450,7 +465,7 @@
         <h2 class="text-2xl font-bold text-slate-800">ทำลายสารเคมี</h2>
         <p class="text-slate-500">บันทึกกรณีสารหมดอายุหรือเสียหาย</p>
       </div>
-      <form id="form-dispose" class="space-y-4">
+      <form id="form-dispose" class="space-y-4" onsubmit="return false;">
         <input type="text" id="d_name" placeholder="ชื่อสารเคมี"
           class="w-full border-2 border-slate-100 rounded-xl p-4 font-bold focus:border-rose-500 focus:outline-none transition-colors"
           required>
@@ -474,7 +489,7 @@
         <h2 class="text-xl font-bold text-slate-800">ปรับยอดสต็อก</h2>
         <p class="text-xs text-slate-500">ใช้เมื่อยอดจริงไม่ตรงกับระบบ</p>
       </div>
-      <form id="form-adjust" class="space-y-4">
+      <form id="form-adjust" class="space-y-4" onsubmit="return false;">
         <input type="hidden" id="adj_lotId">
         <div class="grid grid-cols-2 gap-4">
           <div>
@@ -505,7 +520,7 @@
       <div class="mb-6">
         <h2 class="text-xl font-bold text-slate-800">จัดการผู้ใช้งาน</h2>
       </div>
-      <form id="form-user" class="space-y-4">
+      <form id="form-user" class="space-y-4" onsubmit="return false;">
         <input type="hidden" id="old_u_name">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -556,7 +571,7 @@
         <p class="text-slate-500">ปรับ master data โดยยังคง UI เดิมไว้ใกล้เคียงที่สุด</p>
       </div>
 
-      <form id="form-master" class="space-y-4">
+      <form id="form-master" class="space-y-4" onsubmit="return false;">
         <input type="hidden" id="old_m_name">
         <div>
           <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">ชื่อสารเคมี</label>
