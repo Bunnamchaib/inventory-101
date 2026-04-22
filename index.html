@@ -148,7 +148,7 @@
     </div>
   </div>
 
-  <div id="app-shell" class="hidden">
+  <div id="app-shell" class="hidden-force">
     <div class="max-w-6xl mx-auto px-4 md:px-8 pb-32 pt-5">
       <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8 animate-in">
         <div class="flex items-center gap-3">
@@ -347,6 +347,14 @@
         <span>รายงาน</span>
       </button>
     </nav>
+  </div>
+
+  <div id="global-loading" class="hidden-force fixed inset-0 z-[9998] bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-6">
+    <div class="glass rounded-[28px] px-8 py-7 shadow-2xl min-w-[280px] text-center">
+      <div class="w-12 h-12 mx-auto mb-4 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <h3 id="global-loading-title" class="text-xl font-black text-slate-800">กำลังโหลดข้อมูล</h3>
+      <p id="global-loading-text" class="text-sm text-slate-500 mt-2">โปรดรอสักครู่ ระบบกำลังประมวลผล</p>
+    </div>
   </div>
 
   <div id="modal-withdraw" class="fixed inset-0 modal-backdrop hidden-force flex items-center justify-center z-50 p-4">
