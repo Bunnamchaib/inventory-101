@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Sarabun:wght@300;400;600;700&display=swap">
   <script>
-    const ASSET_VERSION = '20260422-03';
+    const ASSET_VERSION = '20260422-04';
 
     async function loadTextAsset(path) {
       const separator = path.indexOf('?') === -1 ? '?' : '&';
@@ -364,24 +364,26 @@
   </div>
 
   <div id="modal-withdraw" class="fixed inset-0 modal-backdrop hidden-force flex items-center justify-center z-50 p-4">
-    <div class="bg-white/90 glass w-full max-w-2xl p-8 rounded-3xl shadow-2xl relative modal-content">
+    <div class="bg-white/90 glass w-full max-w-xl p-8 rounded-3xl shadow-2xl relative modal-content withdraw-modal">
       <button data-close-modal="withdraw"
         class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 bg-slate-100 p-2 rounded-full transition-colors">✕</button>
 
       <div class="mb-6">
         <h2 class="text-2xl font-bold text-slate-800">เบิกสารเคมี</h2>
-        <p class="text-slate-500">รองรับการอ่าน QR Code และ Barcode จากกล้อง</p>
+        <p class="text-slate-500">เปิดสแกน QR แบบเต็มจอ แล้วค่อยยืนยันข้อมูลการเบิก</p>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-5">
-        <div>
-          <div class="flex items-center gap-2 mb-3">
-            <button id="btn-scan-barcode" type="button" class="scanner-mode-btn">Barcode</button>
-            <button id="btn-scan-qr" type="button" class="scanner-mode-btn active">QR Code</button>
+      <div id="withdraw-scanner-screen" class="withdraw-scanner-screen hidden-force">
+        <div class="withdraw-scanner-header">
+          <div>
+            <p class="withdraw-scanner-kicker">QR Scanner</p>
+            <h3 class="withdraw-scanner-title">สแกนจากกล้องแบบเต็มจอ</h3>
           </div>
-          <div class="scanner-frame-shell">
-            <div id="reader"
-              class="w-full aspect-video bg-slate-900 rounded-2xl overflow-hidden border-4 border-slate-200 shadow-inner"></div>
+          <button id="btn-close-scanner-screen" type="button" class="withdraw-scanner-close">ปิด</button>
+        </div>
+        <div class="withdraw-scanner-stage">
+          <div class="scanner-frame-shell scanner-frame-shell-full">
+            <div id="reader" class="withdraw-reader"></div>
             <div id="scanner-guide" class="scanner-guide scanner-guide-qr" aria-hidden="true">
               <div class="scanner-guide-qr-box">
                 <span class="scanner-corner scanner-corner-tl"></span>
@@ -397,23 +399,40 @@
               </div>
             </div>
           </div>
-          <div id="scanner-status" class="mt-3 text-sm font-bold text-slate-700">กำลังเตรียมโหมด QR Code...</div>
-          <div class="scanner-note rounded-2xl p-4 mt-4 text-sm text-slate-600">
-            <p class="font-bold text-slate-700">วิธีสแกนให้ไว</p>
-            <p class="mt-1">Barcode: เลือกโหมด Barcode แล้วถือโค้ดแนวนอนให้อยู่เต็มกรอบผืนผ้า</p>
-            <p class="mt-1">QR Code: เลือกโหมด QR แล้วจัดให้อยู่กลางกรอบสี่เหลี่ยมจัตุรัส</p>
-            <p class="mt-1">ถ้าสแกนไม่ขึ้น กด “ขอสิทธิ์กล้อง” จากหน้า Settings แล้วกลับมาสแกนใหม่</p>
+        </div>
+        <div class="withdraw-scanner-footer">
+          <div class="flex items-center gap-2 justify-center mb-3">
+            <button id="btn-scan-qr" type="button" class="scanner-mode-btn active">QR Code</button>
+            <button id="btn-scan-barcode" type="button" class="scanner-mode-btn">Barcode</button>
+          </div>
+          <div id="scanner-status" class="withdraw-scanner-status">กำลังเตรียมโหมด QR Code...</div>
+          <div class="withdraw-scanner-help">
+            ถ้ายังสแกนไม่เจอ กดปิดหน้าสแกนเพื่อกลับไปกรอกเอง หรือขอสิทธิ์กล้องใหม่จากหน้า Settings
           </div>
         </div>
-        <form id="form-withdraw" class="space-y-4" onsubmit="return false;">
+      </div>
+
+      <form id="form-withdraw" class="space-y-4" onsubmit="return false;">
+        <div class="scanner-note withdraw-scan-summary rounded-2xl p-4">
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <p class="text-xs font-black text-slate-700 uppercase tracking-[0.18em]">Scan Summary</p>
+              <p class="text-sm text-slate-500 mt-1">จอสแกนจะเปิดเต็มจอทันที และพับกลับมาเมื่อสแกนเจอ</p>
+            </div>
+            <button id="btn-open-scanner-screen" type="button" class="bg-white border border-slate-200 px-4 py-2 rounded-xl font-bold text-sm text-slate-700">เปิดสแกนอีกครั้ง</button>
+          </div>
+
           <div>
             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">ผลลัพธ์จากการสแกน</label>
             <input type="text" id="w_scan" placeholder="QR / Barcode ที่อ่านได้"
               class="w-full border-2 border-slate-100 rounded-xl p-4 font-bold text-slate-700">
           </div>
-          <div>
+          <div class="mt-3">
             <button id="btn-resolve-scan" type="button" class="w-full bg-white border border-slate-200 py-3 rounded-xl font-bold text-slate-700">ค้นหาจากรหัสที่สแกน</button>
           </div>
+        </div>
+
+        <div>
           <div>
             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">ชื่อสารเคมี</label>
             <input type="text" id="w_name"
@@ -440,6 +459,7 @@
           </div>
           <button type="submit" id="btn-w-submit"
             class="w-full btn-premium btn-blue text-white py-5 rounded-2xl font-bold text-xl shadow-lg mt-4">บันทึกเบิกสารเคมี</button>
+        </div>
         </form>
       </div>
     </div>
