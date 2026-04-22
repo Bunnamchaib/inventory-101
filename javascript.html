@@ -1291,7 +1291,16 @@
     Swal.fire({
       icon: "error",
       title: "เกิดข้อผิดพลาด",
-      text: error.message || "Unknown error"
+      html: `<div class="text-left text-sm leading-6">
+        <div>${escapeHtml(error.message || "Unknown error")}</div>
+        <div class="mt-3"><strong>API URL:</strong><br>${escapeHtml(state.apiBaseUrl || "-")}</div>
+        <div class="mt-3">เช็ก 4 จุดนี้:
+          <br>1. Deploy Apps Script เป็น Web app
+          <br>2. ใช้ URL ที่ลงท้ายด้วย <code>/exec</code>
+          <br>3. สิทธิ์เป็น Anyone
+          <br>4. GitHub Pages โหลดไฟล์ใหม่แล้ว ไม่ติด cache เก่า
+        </div>
+      </div>`
     });
   }
 
