@@ -373,45 +373,6 @@
         <p class="text-slate-500">เปิดสแกน QR แบบเต็มจอ แล้วค่อยยืนยันข้อมูลการเบิก</p>
       </div>
 
-      <div id="withdraw-scanner-screen" class="withdraw-scanner-screen hidden-force">
-        <div class="withdraw-scanner-header">
-          <div>
-            <p class="withdraw-scanner-kicker">QR Scanner</p>
-            <h3 class="withdraw-scanner-title">สแกนจากกล้องแบบเต็มจอ</h3>
-          </div>
-          <button id="btn-close-scanner-screen" type="button" class="withdraw-scanner-close">ปิด</button>
-        </div>
-        <div class="withdraw-scanner-stage">
-          <div class="scanner-frame-shell scanner-frame-shell-full">
-            <div id="reader" class="withdraw-reader"></div>
-            <div id="scanner-guide" class="scanner-guide scanner-guide-qr" aria-hidden="true">
-              <div class="scanner-guide-qr-box">
-                <span class="scanner-corner scanner-corner-tl"></span>
-                <span class="scanner-corner scanner-corner-tr"></span>
-                <span class="scanner-corner scanner-corner-bl"></span>
-                <span class="scanner-corner scanner-corner-br"></span>
-                <span class="scanner-scan-line scanner-scan-line-qr"></span>
-              </div>
-              <div class="scanner-guide-barcode-box">
-                <span class="scanner-bar scanner-bar-top"></span>
-                <span class="scanner-bar scanner-bar-bottom"></span>
-                <span class="scanner-scan-line scanner-scan-line-barcode"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="withdraw-scanner-footer">
-          <div class="flex items-center gap-2 justify-center mb-3">
-            <button id="btn-scan-qr" type="button" class="scanner-mode-btn active">QR Code</button>
-            <button id="btn-scan-barcode" type="button" class="scanner-mode-btn">Barcode</button>
-          </div>
-          <div id="scanner-status" class="withdraw-scanner-status">กำลังเตรียมโหมด QR Code...</div>
-          <div class="withdraw-scanner-help">
-            ถ้ายังสแกนไม่เจอ กดปิดหน้าสแกนเพื่อกลับไปกรอกเอง หรือขอสิทธิ์กล้องใหม่จากหน้า Settings
-          </div>
-        </div>
-      </div>
-
       <form id="form-withdraw" class="space-y-4" onsubmit="return false;">
         <div class="scanner-note withdraw-scan-summary rounded-2xl p-4">
           <div class="flex items-start justify-between gap-3 mb-3">
@@ -461,6 +422,45 @@
             class="w-full btn-premium btn-blue text-white py-5 rounded-2xl font-bold text-xl shadow-lg mt-4">บันทึกเบิกสารเคมี</button>
         </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="withdraw-scanner-screen" class="withdraw-scanner-screen hidden-force">
+    <div class="withdraw-scanner-header">
+      <div>
+        <p class="withdraw-scanner-kicker">QR Scanner</p>
+        <h3 class="withdraw-scanner-title">สแกนจากกล้องแบบเต็มจอ</h3>
+      </div>
+      <button id="btn-close-scanner-screen" type="button" class="withdraw-scanner-close">ปิด</button>
+    </div>
+    <div class="withdraw-scanner-stage">
+      <div class="scanner-frame-shell scanner-frame-shell-full">
+        <div id="reader" class="withdraw-reader"></div>
+        <div id="scanner-guide" class="scanner-guide scanner-guide-qr" aria-hidden="true">
+          <div class="scanner-guide-qr-box">
+            <span class="scanner-corner scanner-corner-tl"></span>
+            <span class="scanner-corner scanner-corner-tr"></span>
+            <span class="scanner-corner scanner-corner-bl"></span>
+            <span class="scanner-corner scanner-corner-br"></span>
+            <span class="scanner-scan-line scanner-scan-line-qr"></span>
+          </div>
+          <div class="scanner-guide-barcode-box">
+            <span class="scanner-bar scanner-bar-top"></span>
+            <span class="scanner-bar scanner-bar-bottom"></span>
+            <span class="scanner-scan-line scanner-scan-line-barcode"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="withdraw-scanner-footer">
+      <div class="flex items-center gap-2 justify-center mb-3">
+        <button id="btn-scan-qr" type="button" class="scanner-mode-btn active">QR Code</button>
+        <button id="btn-scan-barcode" type="button" class="scanner-mode-btn">Barcode</button>
+      </div>
+      <div id="scanner-status" class="withdraw-scanner-status">กำลังเตรียมโหมด QR Code...</div>
+      <div class="withdraw-scanner-help">
+        ถ้ายังสแกนไม่เจอ กดปิดหน้าสแกนเพื่อกลับไปกรอกเอง หรือขอสิทธิ์กล้องใหม่จากหน้า Settings
       </div>
     </div>
   </div>
