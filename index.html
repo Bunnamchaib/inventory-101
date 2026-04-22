@@ -13,15 +13,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Sarabun:wght@300;400;600;700&display=swap">
   <script>
+    const ASSET_VERSION = '20260422-02';
+
     async function loadTextAsset(path) {
-      const response = await fetch(path);
+      const separator = path.indexOf('?') === -1 ? '?' : '&';
+      const response = await fetch(path + separator + 'v=' + ASSET_VERSION, { cache: 'no-store' });
       if (!response.ok) throw new Error('Load failed: ' + path);
       return response.text();
     }
 
     function registerServiceWorker() {
       if (!('serviceWorker' in navigator)) return;
-      navigator.serviceWorker.register('./service-worker.js').catch(function (error) {
+      navigator.serviceWorker.register('./service-worker.js?v=' + ASSET_VERSION).catch(function (error) {
         console.error('Service worker registration failed', error);
       });
     }
