@@ -369,11 +369,18 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-5">
         <div>
+          <div class="flex items-center gap-2 mb-3">
+            <button id="btn-scan-barcode" type="button" class="scanner-mode-btn">Barcode</button>
+            <button id="btn-scan-qr" type="button" class="scanner-mode-btn active">QR Code</button>
+          </div>
           <div id="reader"
             class="w-full aspect-video bg-slate-900 rounded-2xl overflow-hidden border-4 border-slate-200 shadow-inner"></div>
+          <div id="scanner-status" class="mt-3 text-sm font-bold text-slate-700">กำลังเตรียมโหมด QR Code...</div>
           <div class="scanner-note rounded-2xl p-4 mt-4 text-sm text-slate-600">
-            <p class="font-bold text-slate-700">สแกนไม่ขึ้น?</p>
-            <p class="mt-1">กด “ขอสิทธิ์กล้อง” จากหน้า Settings ได้ทันที แล้วกลับมาสแกนใหม่</p>
+            <p class="font-bold text-slate-700">วิธีสแกนให้ไว</p>
+            <p class="mt-1">Barcode: เลือกโหมด Barcode แล้วถือโค้ดแนวนอนให้อยู่เต็มกรอบผืนผ้า</p>
+            <p class="mt-1">QR Code: เลือกโหมด QR แล้วจัดให้อยู่กลางกรอบสี่เหลี่ยมจัตุรัส</p>
+            <p class="mt-1">ถ้าสแกนไม่ขึ้น กด “ขอสิทธิ์กล้อง” จากหน้า Settings แล้วกลับมาสแกนใหม่</p>
           </div>
         </div>
         <form id="form-withdraw" class="space-y-4" onsubmit="return false;">
