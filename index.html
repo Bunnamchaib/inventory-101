@@ -50,22 +50,19 @@
     <div class="login-card glass rounded-[32px] p-8 md:p-10 shadow-2xl">
       <div class="flex items-start justify-between gap-4 mb-8">
         <div>
-          <p class="text-[11px] font-black text-blue-500 uppercase tracking-[0.25em]">GitHub Pages Ready</p>
+          <p class="text-[11px] font-black text-blue-500 uppercase tracking-[0.25em]">Chemical Control</p>
           <h1 class="text-3xl font-black tracking-tight text-slate-800 mt-2">ระบบเบิกสารเคมี</h1>
-          <p class="text-slate-500 mt-3 leading-relaxed">ล็อกอินด้วยข้อมูลจาก Google Sheet และเชื่อมต่อผ่าน Apps Script API</p>
+          <p class="text-slate-500 mt-3 leading-relaxed">ล็อกอินและสมัครสมาชิกด้วยข้อมูลจาก Google Sheet</p>
         </div>
         <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-2xl shadow-lg">🧪</div>
       </div>
 
-      <form id="login-form" class="space-y-4">
-        <div>
-          <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Apps Script Web App URL</label>
-          <input id="login-api-url" type="url" required
-            placeholder="https://script.google.com/macros/s/.../exec"
-            class="w-full rounded-2xl border-2 border-slate-100 bg-white px-4 py-4 font-bold text-slate-700 focus:border-blue-500 focus:outline-none transition-colors">
-          <p class="form-help mt-2">นำ URL จาก Deploy > Manage deployments > Web app มาใส่ตรงนี้</p>
-        </div>
+      <div class="glass rounded-2xl p-2 mb-5 flex gap-2">
+        <button id="auth-tab-login" type="button" class="flex-1 bg-blue-600 text-white font-black rounded-2xl py-3">เข้าสู่ระบบ</button>
+        <button id="auth-tab-register" type="button" class="flex-1 text-slate-600 font-black rounded-2xl py-3">สมัครสมาชิก</button>
+      </div>
 
+      <form id="login-form" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Username</label>
@@ -88,9 +85,43 @@
         <div class="flex flex-col sm:flex-row gap-3 pt-2">
           <button id="btn-login" type="submit"
             class="flex-1 btn-premium btn-blue text-white py-4 rounded-2xl font-black text-lg shadow-xl">เข้าสู่ระบบ</button>
-          <button id="btn-test-login-api" type="button"
-            class="sm:w-auto bg-white border border-slate-200 text-slate-700 py-4 px-5 rounded-2xl font-bold hover:bg-slate-50">ทดสอบ API</button>
         </div>
+      </form>
+
+      <form id="register-form" class="space-y-4 hidden-force">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Full Name</label>
+            <input id="register-fullname" type="text" required placeholder="ชื่อ - นามสกุล"
+              class="w-full rounded-2xl border-2 border-slate-100 bg-white px-4 py-4 font-bold text-slate-700 focus:border-blue-500 focus:outline-none transition-colors">
+          </div>
+          <div>
+            <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Department</label>
+            <input id="register-department" type="text" required placeholder="แผนก"
+              class="w-full rounded-2xl border-2 border-slate-100 bg-white px-4 py-4 font-bold text-slate-700 focus:border-blue-500 focus:outline-none transition-colors">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Username</label>
+            <input id="register-username" type="text" required placeholder="เช่น newuser01"
+              class="w-full rounded-2xl border-2 border-slate-100 bg-white px-4 py-4 font-bold text-slate-700 focus:border-blue-500 focus:outline-none transition-colors">
+          </div>
+          <div>
+            <label class="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Password</label>
+            <input id="register-password" type="password" required placeholder="••••••••"
+              class="w-full rounded-2xl border-2 border-slate-100 bg-white px-4 py-4 font-bold text-slate-700 focus:border-blue-500 focus:outline-none transition-colors">
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-4 text-sm text-slate-600 leading-relaxed">
+          <p class="font-black text-slate-800 mb-1">หมายเหตุ</p>
+          <p>เมื่อสมัครแล้ว ระบบจะเพิ่มข้อมูลลงชีต `User_Master` อัตโนมัติ และกำหนดสิทธิ์เริ่มต้นเป็น `USER`</p>
+        </div>
+
+        <button id="btn-register" type="submit"
+          class="w-full btn-premium btn-dark text-white py-4 rounded-2xl font-black text-lg shadow-xl">สมัครสมาชิก</button>
       </form>
 
       <div class="mt-6 text-xs text-slate-400 leading-relaxed">
@@ -174,26 +205,11 @@
         <section class="mb-12">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <div>
-              <h2 class="section-title">Connection & Camera</h2>
-              <p class="text-slate-500 font-medium mt-1">ตั้งค่า API สำหรับ GitHub Pages และจัดการสิทธิ์การใช้กล้อง</p>
+              <h2 class="section-title">Camera & System</h2>
+              <p class="text-slate-500 font-medium mt-1">จัดการสิทธิ์การใช้กล้องและข้อมูลระบบที่จำเป็น</p>
             </div>
           </div>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div class="glass rounded-3xl p-6 space-y-4">
-              <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Apps Script API URL</label>
-                <input type="url" id="settings-api-url" placeholder="https://script.google.com/macros/s/.../exec"
-                  class="w-full border-2 border-slate-100 rounded-xl p-3 font-bold">
-              </div>
-              <div class="flex flex-wrap gap-3">
-                <button id="btn-save-api-url" class="bg-blue-600 text-white px-4 py-3 rounded-xl font-bold text-sm">บันทึก URL</button>
-                <button id="btn-test-api" class="bg-white border border-slate-200 text-slate-700 px-4 py-3 rounded-xl font-bold text-sm">ทดสอบการเชื่อมต่อ</button>
-              </div>
-              <div class="form-help">
-                ต้อง deploy Apps Script เป็น Web App แบบ Anyone เพื่อให้ GitHub Pages เรียกใช้งานได้
-              </div>
-            </div>
-
             <div class="glass rounded-3xl p-6 permission-card">
               <div class="flex items-start justify-between gap-4">
                 <div>
@@ -207,6 +223,19 @@
               <div class="flex flex-wrap gap-3 mt-4">
                 <button id="btn-request-camera" class="btn-premium btn-green text-white px-5 py-3 rounded-2xl font-bold">ขอสิทธิ์กล้อง</button>
                 <button id="btn-check-camera" class="bg-white border border-slate-200 text-slate-700 px-5 py-3 rounded-2xl font-bold">เช็กสถานะอีกครั้ง</button>
+              </div>
+            </div>
+
+            <div class="glass rounded-3xl p-6 space-y-4">
+              <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Apps Script URL</p>
+                <div id="settings-api-url-text" class="code-chip break-all">ยังไม่ได้ตั้งค่าในโค้ด</div>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <button id="btn-test-api" class="bg-white border border-slate-200 text-slate-700 px-4 py-3 rounded-xl font-bold text-sm">ทดสอบการเชื่อมต่อ</button>
+              </div>
+              <div class="form-help">
+                URL ถูกย้ายไปตั้งในไฟล์ `javascript.html` โดยตรงแล้ว ไม่ต้องให้ผู้ใช้กรอกในหน้าเว็บ
               </div>
             </div>
           </div>
