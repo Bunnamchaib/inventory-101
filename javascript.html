@@ -1,7 +1,7 @@
 (function () {
   const APP_CONFIG = {
     // ใส่ URL ของ Apps Script Web App ตรงนี้
-    apiBaseUrl: "https://script.google.com/macros/s/AKfycbyKcvZonOLiiGzNLh-oSy06AMvky_UH31fADfNEQVFN7BCQSVgmp3-KvJ6VvttBbeJ2Gg/exec"
+    apiBaseUrl: "https://script.google.com/macros/s/AKfycbyKcvZonOLiiGzNLh-oSy06AMvky_UH31fADfNEQVFN7BCQSVgmp3-KvJ6VvttBbeJ2Gg"
   };
   const CACHE_PREFIX = "chem_cache_v1";
 
@@ -23,11 +23,15 @@
     scannerMode: "qr",
     scannerBusy: false
   };
+  const DOUBLE_TAP_THRESHOLD = 320;
+  let lastTouchEnd = 0;
+  let lastTouchTarget = null;
 
   const ui = {};
 
   function init() {
     cacheElements();
+    initializeMobileUi();
     bindEvents();
     hydrateSavedSettings();
     setDefaultMonth();
@@ -38,6 +42,13 @@
       return;
     }
     showLoginShell();
+  }
+
+  function initializeMobileUi() {
+    updateViewportMetrics();
+    updateDisplayModeState();
+    bindViewportListeners();
+    bindTouchGuards();
   }
 
   function cacheElements() {
@@ -108,6 +119,67 @@
         closeModal(button.getAttribute("data-close-modal"));
       });
     });
+  }
+
+  function bindViewportListeners() {
+    window.addEventListener("resize", updateViewportMetrics, { passive: true });
+    window.addEventListener("orientationchange", updateViewportMetrics, { passive: true });
+    window.addEventListener("pageshow", updateViewportMetrics, { passive: true });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", updateViewportMetrics, { passive: true });
+      window.visualViewport.addEventListener("scroll", updateViewportMetrics, { passive: true });
+    }
+    const standaloneMedia = window.matchMedia ? window.matchMedia("(display-mode: standalone)") : null;
+    if (standaloneMedia && standaloneMedia.addEventListener) {
+      standaloneMedia.addEventListener("change", updateDisplayModeState);
+    }
+    document.addEventListener("focusin", handleMobileFocusAssist, { passive: true });
+  }
+
+  function updateViewportMetrics() {
+    const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    document.documentElement.style.setProperty("--app-height", `${Math.round(viewportHeight)}px`);
+  }
+
+  function updateDisplayModeState() {
+    const isStandalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+    document.documentElement.classList.toggle("is-standalone", isStandalone);
+  }
+
+  function bindTouchGuards() {
+    if (!window.matchMedia || !window.matchMedia("(pointer: coarse)").matches) return;
+
+    document.addEventListener("touchend", function (event) {
+      if (event.touches && event.touches.length > 0) return;
+
+      const interactiveTarget = event.target.closest("button, a, .tab-item, .btn-premium, .scanner-mode-btn, [role='button']");
+      if (!interactiveTarget) return;
+
+      const now = Date.now();
+      const isSameTarget = lastTouchTarget === interactiveTarget;
+      if (isSameTarget && now - lastTouchEnd < DOUBLE_TAP_THRESHOLD) {
+        event.preventDefault();
+        interactiveTarget.click();
+      }
+
+      lastTouchEnd = now;
+      lastTouchTarget = interactiveTarget;
+    }, { passive: false });
+  }
+
+  function handleMobileFocusAssist(event) {
+    const target = event.target;
+    if (!target || !target.matches || !target.matches("input, select, textarea")) return;
+    if (!window.matchMedia || !window.matchMedia("(max-width: 768px)").matches) return;
+
+    const modalContent = target.closest(".modal-content");
+    if (!modalContent) return;
+
+    window.setTimeout(function () {
+      try {
+        target.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
+      } catch (error) {}
+    }, 180);
   }
 
   function enableBootControls() {
